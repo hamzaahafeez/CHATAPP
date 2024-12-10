@@ -1,0 +1,206 @@
+﻿@{
+	ViewData["Title"] = "Chat";
+	string senderUsername = User.Identity.Name;
+}
+
+@model List<CHATAPP.Models.Message>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>@ViewData["Title"]</title>
+	<style>
+		/* Chat container styling */
+		.chat-container {
+			margin: 0 auto;
+			width: 600px;
+			padding: 20px;
+			background-color: #fff;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			display: flex;
+			border-radius: 10px;
+			flex-direction: column;
+		}
+
+
+		#chatMessages {
+			height: 400px;
+			overflow-y: auto;
+			margin-bottom: 10px;
+			padding-right: 10px;
+		}
+
+
+		.message {
+			display: flex;
+			align-items: flex-start;
+			padding: 12px;
+			border-radius: 10px;
+			margin-bottom: 12px;
+			max-width: 75%;
+			font-size: 14px;
+			line-height: 1.5;
+			flex-direction: column;
+		}
+
+
+		.sent-message {
+			background-color: #d1f7c4;
+			align-self: flex-end;
+			margin-left: auto;
+			border-radius: 10px 10px 0 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			max-width: 80%;
+		}
+
+
+		.received-message {
+			background-color: #f0f0f0;
+			align-self: flex-start;
+			border-radius: 10px 10px 10px 0;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			max-width: 80%;
+		}
+
+
+		.avatar {
+			width: 30px;
+			height: 30px;
+			background-color: #4CAF50;
+			color: white;
+			font-weight: bold;
+			font-size: 18px;
+			text-align: center;
+			line-height: 30px;
+			border-radius: 50%;
+			margin-right: 10px;
+			display: inline-block;
+			vertical-align: middle;
+		}
+
+		.message-content {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+		}
+
+		.sender {
+			font-weight: bold;
+			color: #555;
+		}
+
+		.message-date {
+			margin-top: 5px;
+			font-size: 12px;
+			color: #999;
+			text-align: right;
+			margin-top: auto;
+		}
+
+		textarea {
+			width: 100%;
+			height: 50px;
+			padding: 10px;
+			margin-top: 10px;
+		}
+
+		button {
+			padding: 10px 20px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		.chat-container {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<div class="chat-container">
+		<h2>Chat with @ViewData["ReceiverUsername"]</h2>
+
+		<!-- Display messages -->
+		<div id="chatMessages">
+			@foreach (var message in Model)
+			{
+				<div class="message @(message.SenderUsername == senderUsername ? "sent-message" : "received-message")">
+
+					<div class="message-content">
+						@message.Text
+						<div class="message-date">
+							c<small>@message.Date.ToString("yyyy-MM-dd HH:mm:ss")</small>
+						</div>
+					</div>
+				</div>
+			}
+
+
+
+		</div>
+
+		<form method="post" id="sendMessageForm" action="@Url.Action("SendMessage", "Chat")">
+			<textarea name="messageText" id="messageText" required></textarea>
+			<input type="hidden" name="senderUsername" value="@senderUsername" />
+			<input type="hidden" name="receiverUsername" value="@ViewData["ReceiverUsername"]" />
+			<button type="submit">Send</button>
+		</form>
+	</div>
+
+	<script>
+		// Function to fetch and update chat messages
+		function fetchMessages() {
+			let receiverUsername = "@ViewData["ReceiverUsername"]";
+			let senderUsername = "@senderUsername";
+
+			$.ajax({
+				url: '@Url.Action("Index", "Chat")',
+				data: { receiverUsername: receiverUsername },
+				method: 'GET',
+				success: function(response) {
+					$("#chatMessages").html($(response).find("#chatMessages").html());
+					scrollToBottom();
+				}
+			});
+		}
+
+		function scrollToBottom() {
+			var chatMessages = document.getElementById('chatMessages');
+			chatMessages.scrollTop = chatMessages.scrollHeight;
+		}
+		setInterval(fetchMessages, 1000);
+		$('#sendMessageForm').on('submit', function(e) {
+			e.preventDefault();
+
+			let messageText = $('#messageText').val();
+			let senderUsername = '@senderUsername';
+			let receiverUsername = '@ViewData["ReceiverUsername"]';
+
+			$.ajax({
+				url: '@Url.Action("SendMessage", "Chat")',
+				method: 'POST',
+				data: {
+					senderUsername: senderUsername,
+					receiverUsername: receiverUsername,
+					messageText: messageText
+				},
+				success: function() {
+					$('#messageText').val('');
+					fetchMessages();
+				},
+				error: function() {
+					alert("Error sending message");
+				}
+			});
+		});
+	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</body>
+</html>
