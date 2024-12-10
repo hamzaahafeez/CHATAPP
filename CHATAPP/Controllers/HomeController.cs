@@ -16,10 +16,10 @@ namespace CHATAPP.Controllers
         {
             connectionString = _connectionString;
         }
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+       // public HomeController(ILogger<HomeController> logger)
+        //{
+        //    _logger = logger;
+        //}
         public IActionResult Index()
         {
             List<Users> users = GetUsers();
