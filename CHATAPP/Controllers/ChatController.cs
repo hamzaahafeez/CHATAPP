@@ -6,8 +6,11 @@ namespace CHATAPP.Controllers
 {
     public class ChatController : Controller
     {
-        private string connectionString = "Data Source=Hamza;Initial Catalog=CHATAPP;Integrated Security=True;TrustServerCertificate=True;";
-
+        private readonly string connectionString;
+        public ChatController(string _connectionString)
+        {
+            connectionString = _connectionString;
+        }
         public IActionResult Index()
         {
             string receiverUsername = Request.Query["receiverUsername"];

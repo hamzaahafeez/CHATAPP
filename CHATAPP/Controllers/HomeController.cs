@@ -10,8 +10,12 @@ namespace CHATAPP.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private string connectionString = "Data Source=Hamza;Initial Catalog=CHATAPP;Integrated Security=True;TrustServerCertificate=True;";
+        private readonly string connectionString;
 
+        public HomeController(string _connectionString)
+        {
+            connectionString = _connectionString;
+        }
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;

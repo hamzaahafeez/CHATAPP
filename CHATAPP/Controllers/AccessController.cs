@@ -9,8 +9,11 @@ namespace CHATAPP.Controllers
 {
     public class AccessController : Controller
     {
-        private string connectionString = "Data Source=Hamza;Initial Catalog=CHATAPP;Integrated Security=True;TrustServerCertificate=True;";
-
+        private readonly string connectionString;
+        public AccessController(string _connectionString)
+        {
+            connectionString = _connectionString;
+        }
         public IActionResult Login()
         {
             if (User.Identity.IsAuthenticated)
